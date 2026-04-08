@@ -1,0 +1,73 @@
+package com.terpel.backend.service.impl;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.terpel.backend.exception.DuplicateResourceException;
+import com.terpel.backend.exception.ResourceNotFoundException;
+import com.terpel.backend.mapper.EstacionMapper;
+import com.terpel.backend.model.dto.EstacionRequestDto;
+import com.terpel.backend.model.dto.EstacionResponseDto;
+import com.terpel.backend.model.entity.Estacion;
+import com.terpel.backend.repository.EstacionRepository;
+import com.terpel.backend.service.EstacionService;
+
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+
+@Service
+@AllArgsConstructor
+public class EstacionServiceImpl implements EstacionService {
+
+    private static final String ESTACION_NO_ENCONTRADA = "Estación no encontrada con ID: ";
+    private final EstacionRepository estacionRepository;
+    private final EstacionMapper mapper;
+
+    @Override
+    public EstacionResponseDto crearEstacion(EstacionRequestDto estacion) {
+        if (estacionRepository.existsByCodigo(estacion.getCodigo())) {
+            throw new DuplicateResourceException("Ya existe una estación con el código: " + estacion.getCodigo());
+        }
+        Estacion estacionEntity = estacionRepository.save(mapper.toEntity(estacion));
+        return mapper.toDto(estacionEntity);
+    }
+
+    @Override
+    public EstacionResponseDto obtenerEstacionPorId(Long id) {
+        Estacion estacion = estacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(ESTACION_NO_ENCONTRADA + id));
+        return mapper.toDto(estacion);
+    }
+
+    @Override
+    public List<EstacionResponseDto> obtenerTodasLasEstaciones() {
+        List<Estacion> estaciones = estacionRepository.findAll();
+        return mapper.toDtoList(estaciones);
+    }
+
+    @Override
+    @Transactional
+    public EstacionResponseDto actualizarEstacion(Long id, EstacionRequestDto estacion) {
+        Estacion estacionExistente = estacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(ESTACION_NO_ENCONTRADA + id));
+
+        if (!estacionExistente.getCodigo().equals(estacion.getCodigo())
+                && estacionRepository.existsByCodigo(estacion.getCodigo())) {
+            throw new DuplicateResourceException("Ya existe una estación con el código: " + estacion.getCodigo());
+        }
+
+        mapper.updateEntity(estacion, estacionExistente);
+
+        Estacion updatedEstacion = estacionRepository.save(estacionExistente);
+        return mapper.toDto(updatedEstacion);
+    }
+
+    @Override
+    public void eliminarEstacion(Long id) {
+        Estacion estacionExistente = estacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(ESTACION_NO_ENCONTRADA + id));
+        estacionRepository.delete(estacionExistente);
+    }
+
+}
