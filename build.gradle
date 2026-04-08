@@ -27,6 +27,7 @@ ext {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
 
 	// MapStruct
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
@@ -60,8 +61,9 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-// Pasar configuración de MapStruct al compilador
+// Pasar configuración de MapStruct al compilador y preservar nombres de parámetros
 compileJava.options.compilerArgs += [
+	'-parameters',
 	'-Amapstruct.defaultComponentModel=spring',
 	'-Amapstruct.unmappedTargetPolicy=IGNORE'
 ]

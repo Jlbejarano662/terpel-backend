@@ -2,6 +2,9 @@ package com.terpel.backend.service.impl;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import com.terpel.backend.exception.DuplicateResourceException;
@@ -25,6 +28,7 @@ public class EstacionServiceImpl implements EstacionService {
     private final EstacionMapper mapper;
 
     @Override
+    @CacheEvict(value = "estaciones", allEntries = true)
     public EstacionResponseDto crearEstacion(EstacionRequestDto estacion) {
         if (estacionRepository.existsByCodigo(estacion.getCodigo())) {
             throw new DuplicateResourceException("Ya existe una estación con el código: " + estacion.getCodigo());
@@ -34,6 +38,7 @@ public class EstacionServiceImpl implements EstacionService {
     }
 
     @Override
+    @Cacheable(value = "estacion", key = "#id")
     public EstacionResponseDto obtenerEstacionPorId(Long id) {
         Estacion estacion = estacionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ESTACION_NO_ENCONTRADA + id));
@@ -41,6 +46,7 @@ public class EstacionServiceImpl implements EstacionService {
     }
 
     @Override
+    @Cacheable("estaciones")
     public List<EstacionResponseDto> obtenerTodasLasEstaciones() {
         List<Estacion> estaciones = estacionRepository.findAll();
         return mapper.toDtoList(estaciones);
@@ -48,6 +54,10 @@ public class EstacionServiceImpl implements EstacionService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "estacion", key = "#id"),
+        @CacheEvict(value = "estaciones", allEntries = true)
+    })
     public EstacionResponseDto actualizarEstacion(Long id, EstacionRequestDto estacion) {
         Estacion estacionExistente = estacionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ESTACION_NO_ENCONTRADA + id));
@@ -64,6 +74,10 @@ public class EstacionServiceImpl implements EstacionService {
     }
 
     @Override
+    @Caching(evict = {
+        @CacheEvict(value = "estacion", key = "#id"),
+        @CacheEvict(value = "estaciones", allEntries = true)
+    })
     public void eliminarEstacion(Long id) {
         Estacion estacionExistente = estacionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ESTACION_NO_ENCONTRADA + id));
