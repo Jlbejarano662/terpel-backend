@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.terpel.backend.exception.DuplicateResourceException;
 import com.terpel.backend.exception.ResourceNotFoundException;
@@ -16,7 +17,6 @@ import com.terpel.backend.model.entity.Estacion;
 import com.terpel.backend.repository.EstacionRepository;
 import com.terpel.backend.service.EstacionService;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -28,6 +28,7 @@ public class EstacionServiceImpl implements EstacionService {
     private final EstacionMapper mapper;
 
     @Override
+    @Transactional
     @CacheEvict(value = "estaciones", allEntries = true)
     public EstacionResponseDto crearEstacion(EstacionRequestDto estacion) {
         if (estacionRepository.existsByCodigo(estacion.getCodigo())) {
@@ -74,6 +75,7 @@ public class EstacionServiceImpl implements EstacionService {
     }
 
     @Override
+    @Transactional
     @Caching(evict = {
         @CacheEvict(value = "estacion", key = "#id"),
         @CacheEvict(value = "estaciones", allEntries = true)

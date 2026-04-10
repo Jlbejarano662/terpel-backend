@@ -23,11 +23,11 @@ public class OpenApiConfig {
                                 API REST para la gestión de estaciones.
 
                                 **Endpoints disponibles:**
-                                - `POST /api/v1/estaciones` — Crear estación
-                                - `GET  /api/v1/estaciones` — Listar con paginación
-                                - `GET  /api/v1/estaciones/{id}` — Obtener por ID
-                                - `PUT  /api/v1/estaciones/{id}` — Actualizar estación
-                                - `DELETE /api/v1/estaciones/{id}` — Eliminar estación
+                                - `POST /api/stations` — Crear estación
+                                - `GET  /api/stations` — Listar estaciones
+                                - `GET  /api/stations/{id}` — Obtener por ID
+                                - `PUT  /api/stations/{id}` — Actualizar estación
+                                - `DELETE /api/stations/{id}` — Eliminar estación
                                 """)
                         .version("1.0.0")
                         .contact(new Contact()
