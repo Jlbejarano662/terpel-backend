@@ -20,7 +20,7 @@ No se requiere instalar base de datos — se usa H2 embebida en memoria.
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/Jlbejarano662/terpel-backend.git
 cd backend
 ```
 
